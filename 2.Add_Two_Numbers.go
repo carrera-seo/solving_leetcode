@@ -16,94 +16,57 @@ type ListNode struct {
 	Next *ListNode
 }
 
-func reverseList(ll *ListNode) []int {
-	// list 를 뒤집어서 배열에 저장한다.
-	var arr []int
-
-	for current := ll; current != nil; current = current.Next {
-		arr = append([]int{current.Val}, arr...)
-	}
-
-	return arr
-}
-
 func divideAndMod(num int) (int, int) {
 	quotient := num / 10  // 10으로 나눈 몫
 	remainder := num % 10 // 10으로 나눈 나머지
 	return quotient, remainder
 }
 
-func listToListNode(sum_list []int, result_list *ListNode) *ListNode {
+func sumTwoLists(l1 *ListNode, l2 *ListNode, pass_val int, result_list *ListNode) *ListNode {
 
-	//fmt.Printf("quo : %d , rem : %d \n", quotient, remainder)
+	sum := 0
+	if l1 != nil {
+		sum += l1.Val
+	}
+	if l2 != nil {
+		sum += l2.Val
+	}
 
-	if len(sum_list) == 1 {
-		result_list.Val = sum_list[0]
+	if pass_val > 0 {
+		sum += pass_val
+		pass_val = 0
+	}
+
+	if sum >= 10 {
+		quotient, remainder := divideAndMod(sum)
+		pass_val = quotient
+		sum = remainder
+	}
+
+	result_list.Val = sum
+	if pass_val == 0 && (l1 == nil || l1.Next == nil) && (l2 == nil || l2.Next == nil) {
 		result_list.Next = nil
 	} else {
-		first := sum_list[0]
-		sum_list = sum_list[1:]
-		result_list.Val = first
-		result_list.Next = &ListNode{Val: 0}
-		listToListNode(sum_list, result_list.Next)
+		result_list.Next = &ListNode{}
 	}
+
+	if (l1 != nil && l1.Next != nil) && (l2 != nil && l2.Next != nil) {
+		sumTwoLists(l1.Next, l2.Next, pass_val, result_list.Next)
+	} else if (l1 == nil || l1.Next == nil) && (l2 != nil && l2.Next != nil) {
+		sumTwoLists(nil, l2.Next, pass_val, result_list.Next)
+	} else if (l1 != nil && l1.Next != nil) && (l2 == nil || l2.Next == nil) {
+		sumTwoLists(l1.Next, nil, pass_val, result_list.Next)
+	} else if pass_val > 0 && (l1 == nil || l1.Next == nil) && (l2 == nil || l2.Next == nil) {
+		sumTwoLists(nil, nil, pass_val, result_list.Next)
+	}
+
 	return result_list
+
 }
 
 func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
 
-	l1_result := reverseList(l1)
-	l2_result := reverseList(l2)
-
-	if len(l1_result) > len(l2_result) {
-		need_count := len(l1_result) - len(l2_result)
-		for i := 0; i < need_count; i++ {
-			l2_result = append([]int{0}, l2_result...)
-		}
-	} else if len(l1_result) < len(l2_result) {
-		need_count := len(l2_result) - len(l1_result)
-		for i := 0; i < need_count; i++ {
-			l1_result = append([]int{0}, l1_result...)
-		}
-	}
-
-	//two_sum := l1_result + l2_result
-	//fmt.Print("l1 : ", l1_result, "\n")
-	//fmt.Print("l2 : ", l2_result, "\n")
-
-	var sum_list []int
-
-	next_sum := 0
-
-	for i := len(l1_result) - 1; i >= 0; i-- {
-
-		sum := l1_result[i] + l2_result[i]
-
-		if next_sum > 0 {
-			sum += next_sum
-			next_sum = 0
-		}
-
-		if sum >= 10 {
-			quotient, remainder := divideAndMod(sum)
-			next_sum = quotient
-			sum = remainder
-		}
-
-		sum_list = append(sum_list, sum)
-
-	}
-
-	if next_sum > 0 {
-		sum_list = append(sum_list, next_sum)
-	}
-
-	//fmt.Print("sum_list : ", sum_list, "\n")
-
-	result := listToListNode(sum_list, &ListNode{})
-
-	return result
-
+	return sumTwoLists(l1, l2, 0, &ListNode{})
 }
 
 // 테스트 함수
