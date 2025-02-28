@@ -70,7 +70,7 @@ func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
 }
 
 // 테스트 함수
-func main() {
+func test() {
 
 	// 첫 번째 연결 리스트: 2->4->3 (342)
 	l1 := &ListNode{Val: 2, Next: &ListNode{Val: 4, Next: &ListNode{Val: 3, Next: &ListNode{Val: 8}}}}
